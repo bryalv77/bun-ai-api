@@ -38,6 +38,8 @@ const server = Bun.serve({
       });
     } else if (req.method === "GET" && pathname === "/health") {
       return new Response("OK", { status: 200 });
+    } else if (req.method === "GET" && pathname === "/") {
+      return new Response("Hello world", { status: 200 });
     }
     return new Response("Not found", { status: 404 });
   },
