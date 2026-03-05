@@ -36,6 +36,8 @@ const server = Bun.serve({
       return new Response(JSON.stringify(services.map((s) => s.name)), {
         headers: { "Content-Type": "application/json" },
       });
+    } else if (req.method === "GET" && pathname === "/health") {
+      return new Response("OK", { status: 200 });
     }
     return new Response("Not found", { status: 404 });
   },
