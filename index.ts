@@ -1,9 +1,10 @@
 import { cerebrasService } from "./services/cerebras";
+import { geminiService } from "./services/gemini";
 import { groqService } from "./services/groq";
 import { openrouterService } from "./services/openrouter";
 import type { AIService, ChatMessage } from "./types";
 
-const services: AIService[] = [groqService, cerebrasService, openrouterService];
+const services: AIService[] = [groqService, cerebrasService, openrouterService, geminiService];
 
 let currentServiceIndex = 0;
 
