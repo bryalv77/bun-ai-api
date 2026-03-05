@@ -8,10 +8,26 @@ const services: AIService[] = [groqService, cerebrasService, openrouterService, 
 
 let currentServiceIndex = 0;
 
-function getNextService() {
-  const service = services[currentServiceIndex];
-  currentServiceIndex = (currentServiceIndex + 1) % services.length;
-  return service;
+async function tryGetService(messages: ChatMessage[]): Promise<AsyncIterable<string>> {
+  const maxAttempts = services.length;
+  let lastError: Error | null = null;
+
+  for (let i = 0; i < maxAttempts; i++) {
+    const service = services[currentServiceIndex];
+    currentServiceIndex = (currentServiceIndex + 1) % services.length;
+
+    try {
+      if (!service) continue;
+      console.log(`Trying service: ${service.name}`);
+      return await service.chat(messages);
+    } catch (error) {
+      lastError = error as Error;
+      console.error(`Service ${service?.name} failed:`, lastError.message);
+      continue;
+    }
+  }
+
+  throw lastError || new Error("All services failed");
 }
 
 const server = Bun.serve({
@@ -21,17 +37,24 @@ const server = Bun.serve({
 
     if (req.method === "POST" && pathname === "/chat") {
       const { messages } = (await req.json()) as { messages: ChatMessage[] };
-      const service = getNextService();
-      console.log(`Using service: ${service?.name}`);
-      const stream = await service?.chat(messages);
 
-      return new Response(stream, {
-        headers: {
-          "Content-Type": "text/event-stream",
-          "Cache-Control": "no-cache",
-          Connection: "keep-alive",
-        },
-      });
+      try {
+        const stream = await tryGetService(messages);
+
+        return new Response(stream, {
+          headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+          },
+        });
+      } catch (error) {
+        console.error("All services failed:", error);
+        return new Response(JSON.stringify({ error: "All AI services are currently unavailable" }), {
+          status: 503,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
     } else if (req.method === "GET" && pathname === "/services") {
       return new Response(JSON.stringify(services.map((s) => s.name)), {
         headers: { "Content-Type": "application/json" },

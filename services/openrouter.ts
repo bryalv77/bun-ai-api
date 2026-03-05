@@ -11,9 +11,9 @@ export const openrouterService: AIService = {
   async chat(messages: ChatMessage[]) {
     const chatCompletion = await openrouter.chat.completions.create({
       messages,
-      model: "anthropic/claude-3.5-sonnet",
+      model: "meta-llama/llama-3.1-8b-instruct:free",
       temperature: 0.7,
-      max_tokens: 4096,
+      max_tokens: 1000,
       top_p: 1,
       stream: true,
     });

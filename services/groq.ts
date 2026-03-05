@@ -8,9 +8,9 @@ export const groqService: AIService = {
   async chat(messages: ChatMessage[]) {
     const chatCompletion = await groq.chat.completions.create({
       messages,
-      model: "moonshotai/kimi-k2-instruct-0905",
+      model: "llama-3.3-70b-versatile",
       temperature: 0.6,
-      max_completion_tokens: 4096,
+      max_completion_tokens: 2048,
       top_p: 1,
       stream: true,
       stop: null,

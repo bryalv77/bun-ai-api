@@ -7,7 +7,7 @@ export const geminiService: AIService = {
   name: "Gemini",
   async chat(messages: ChatMessage[]) {
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-pro",
+      model: "gemini-1.5-flash",
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 8192,
