@@ -32,6 +32,10 @@ const server = Bun.serve({
           Connection: "keep-alive",
         },
       });
+    } else if (req.method === "GET" && pathname === "/services") {
+      return new Response(JSON.stringify(services.map((s) => s.name)), {
+        headers: { "Content-Type": "application/json" },
+      });
     }
     return new Response("Not found", { status: 404 });
   },
